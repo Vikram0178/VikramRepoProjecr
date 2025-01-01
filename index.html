@@ -3,40 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Link Tracker</title>
+    <title>Tracking Link Generator</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        input[type="text"] { width: 100%; padding: 10px; margin: 10px 0; }
+        input[type="submit"] { padding: 10px 20px; background-color: #4CAF50; color: white; border: none; cursor: pointer; }
+        input[type="submit"]:hover { background-color: #45a049; }
+        .result { margin-top: 20px; }
+    </style>
 </head>
 <body>
-    <h1>URL Tracking Link Generator</h1>
-    <form id="urlForm">
-        <label for="urlInput">Enter the URL to track:</label><br>
-        <input type="url" id="urlInput" name="url" required><br><br>
-        <button type="submit">Generate Tracking Link</button>
-    </form>
+    <div class="container">
+        <h1>Generate Tracking Link</h1>
+        <form id="trackingForm">
+            <label for="url">Enter URL to Track:</label>
+            <input type="text" id="url" name="url" placeholder="Enter a valid URL (http:// or https://)" required>
+            <input type="submit" value="Generate Tracking Link">
+        </form>
 
-    <div id="generatedLinks" style="margin-top: 20px;"></div>
+        <div class="result" id="result"></div>
+    </div>
 
     <script>
-        document.getElementById('urlForm').addEventListener('submit', function(event) {
+        document.getElementById('trackingForm').addEventListener('submit', function(event) {
             event.preventDefault();
-            var url = document.getElementById('urlInput').value;
-            fetch('/generate', {
+
+            const url = document.getElementById('url').value;
+            fetch('https://stupendous-harvest-digit.glitch.me/create-link', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ url: url })
             })
             .then(response => response.json())
             .then(data => {
-                const linksDiv = document.getElementById('generatedLinks');
-                linksDiv.innerHTML = `
-                    <h3>Generated Links:</h3>
-                    <p><strong>Cloudflare Tracking Link:</strong> <a href="${data.cloudflare}" target="_blank">${data.cloudflare}</a></p>
-                    <p><strong>Webview Tracking Link:</strong> <a href="${data.webview}" target="_blank">${data.webview}</a></p>
-                `;
+                const resultDiv = document.getElementById('result');
+                if (data && data.trackingLink) {
+                    resultDiv.innerHTML = `<p>Your tracking link: <a href="${data.trackingLink}" target="_blank">${data.trackingLink}</a></p>`;
+                } else {
+                    resultDiv.innerHTML = `<p>Error generating the link. Please try again.</p>`;
+                }
             })
-            .catch(err => {
-                console.error('Error:', err);
+            .catch(error => {
+                console.error('Error:', error);
             });
         });
     </script>
