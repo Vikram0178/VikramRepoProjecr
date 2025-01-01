@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Link Tracker</title>
+</head>
+<body>
+    <h1>URL Tracking Link Generator</h1>
+    <form id="urlForm">
+        <label for="urlInput">Enter the URL to track:</label><br>
+        <input type="url" id="urlInput" name="url" required><br><br>
+        <button type="submit">Generate Tracking Link</button>
+    </form>
+
+    <div id="generatedLinks" style="margin-top: 20px;"></div>
+
+    <script>
+        document.getElementById('urlForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            var url = document.getElementById('urlInput').value;
+            fetch('/generate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ url: url })
+            })
+            .then(response => response.json())
+            .then(data => {
+                const linksDiv = document.getElementById('generatedLinks');
+                linksDiv.innerHTML = `
+                    <h3>Generated Links:</h3>
+                    <p><strong>Cloudflare Tracking Link:</strong> <a href="${data.cloudflare}" target="_blank">${data.cloudflare}</a></p>
+                    <p><strong>Webview Tracking Link:</strong> <a href="${data.webview}" target="_blank">${data.webview}</a></p>
+                `;
+            })
+            .catch(err => {
+                console.error('Error:', err);
+            });
+        });
+    </script>
+</body>
+</html>
